@@ -41,7 +41,6 @@ local function spamremotes(delayBetween)
 	delayBetween = tonumber(delayBetween) or 0.01
 	enabled = true
 
-	-- payloads globaux (créés UNE FOIS)
 	local payloads = {
 		{player},
 		{player, character},
@@ -80,7 +79,6 @@ local function spamremotes(delayBetween)
 		if obj:IsA("RemoteEvent") then
 			print("[SPAM] RemoteEvent :", obj:GetFullName())
 
-			-- 🔥 UN THREAD PAR REMOTE
 			task.spawn(function()
 				local index = 1
 
@@ -131,6 +129,92 @@ local function stopFly()
 	if bg then bg:Destroy() bg=nil end
 end
 
+local aimbotEnabled = false
+local aimbotFOV = 500 
+local aimbotSensitivity = 0.2
+local camera = workspace.CurrentCamera
+
+local RunService = game:GetService("RunService")
+
+local fovGui = Instance.new("ScreenGui")
+fovGui.Name = "AimbotFOV"
+fovGui.ResetOnSpawn = false
+fovGui.IgnoreGuiInset = true
+fovGui.Parent = player.PlayerGui
+
+
+local circle = Instance.new("Frame")
+circle.Size = UDim2.new(0, aimbotFOV*2, 0, aimbotFOV*2)
+circle.Position = UDim2.new(0.5, -aimbotFOV, 0.5, -aimbotFOV)
+circle.AnchorPoint = Vector2.new(0.5, 0.5)
+circle.BackgroundTransparency = 1
+circle.BorderSizePixel = 2
+circle.BorderColor3 = Color3.fromRGB(255, 0, 0)
+circle.Parent = player.PlayerGui 
+
+local function getClosestNPC()
+	local closestDist = math.huge
+	local closest = nil
+
+	for _, npc in pairs(Players:GetPlayers()) do
+		if npc ~= player and player.Character then
+		if npc.Character:FindFirstChild("HumanoidRootPart") then
+			local hrp = npc.Character.HumanoidRootPart
+			local screenPos, onScreen = camera:WorldToViewportPoint(hrp.Position)
+			if onScreen then
+				local mousePos = UserInputService:GetMouseLocation()
+				local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(mousePos.X, mousePos.Y)).Magnitude
+				if dist < closestDist and dist <= aimbotFOV then
+					closestDist = dist
+					closest = hrp
+				end
+			end
+		end
+		end
+	end
+
+	return closest
+end
+
+local defaultMouseIcon = ""
+local aimingMouseIcon = "http://www.roblox.com/asset/?id=116440005075784"
+
+local aimbotConn
+local function startAimbot()
+	if aimbotEnabled then return end
+	aimbotEnabled = true
+
+	aimbotConn = RunService.RenderStepped:Connect(function()
+		if not aimbotEnabled then return end
+
+		circle.Position = UDim2.fromScale(0.5, 0.5)
+
+		local target = getClosestNPC()
+		if target then
+			UserInputService.MouseIconEnabled = true
+			UserInputService.MouseIcon = aimingMouseIcon
+
+			local hrpPos = target.Position
+			local camPos = camera.CFrame.Position
+			local direction = (hrpPos - camPos).Unit
+			local currentLook = camera.CFrame.LookVector
+			local newLook = currentLook:Lerp(direction, aimbotSensitivity)
+			camera.CFrame = CFrame.new(camPos, camPos + newLook)
+		else
+			UserInputService.MouseIconEnabled = true
+			UserInputService.MouseIcon = defaultMouseIcon
+		end
+	end)
+end
+
+local function stopAimbot()
+	aimbotEnabled = false
+	if aimbotConn then
+		aimbotConn:Disconnect()
+		aimbotConn = nil
+	end
+	circle:Destroy()
+end
 
 local flinging = false
 local flingConn
@@ -175,17 +259,14 @@ local function applyGodmode()
 	if not character then return end
 	local hum = character:WaitForChild("Humanoid")
 
-	-- Nettoie ancienne connexion
 	if regenConn then
 		regenConn:Disconnect()
 		regenConn = nil
 	end
 
-	-- Valeurs normales (ou augmente si tu veux)
 	hum.MaxHealth = 100
 	hum.Health = hum.MaxHealth
 
-	-- Regen instant
 	regenConn = hum.HealthChanged:Connect(function(hp)
 		if hp < hum.MaxHealth and hp > 0 then
 			hum.Health = hum.MaxHealth
@@ -215,13 +296,22 @@ for _, child in pairs(character:GetDescendants()) do
 			child.CanTouch = false
 			child.Massless = true
 		else
-			-- HRP garde la collision pour rester sur le sol
 			child.CanCollide = true
 			child.Massless = false
 		end
 	end
+for _, plrs in pairs(game.Players:GetPlayers()) do
+	if plrs.Character == player.Character then return end
+	local ochar = plrs.Character
+	for _, basepart in pairs(ochar:GetDescendants()) do
+		if basepart:IsA("BasePart") then
+			if basepart.CanCollide == false then
+			basepart.CanCollide = true
+			end
+		end
+	end
+ end
 end
-
 
 	startNoclip()
 	task.wait()
@@ -292,13 +382,11 @@ local function createESPForPlayer(plr)
 	local hum = char:FindFirstChildOfClass("Humanoid")
 	if not hrp or not hum then return end
 
-	-- Highlight
 	local hl = Instance.new("Highlight")
 	hl.FillColor = Color3.fromRGB(3, 255, 20)
 	hl.OutlineColor = Color3.new(0,0,0)
 	hl.Parent = char
-
-	-- Billboard GUI
+	
 	local billboard = Instance.new("BillboardGui", char)
 	billboard.Size = UDim2.new(0,100,0,50)
 	billboard.Adornee = hrp
@@ -320,7 +408,6 @@ local function createESPForPlayer(plr)
 	healthLabel.Font = Enum.Font.Gotham
 	healthLabel.TextScaled = true
 
-	-- Part USP attachée
 	local uspPart = Instance.new("Part")
 	uspPart.Size = Vector3.new(0.5,0.5,0.5)
 	uspPart.Anchored = true
@@ -329,7 +416,6 @@ local function createESPForPlayer(plr)
 	uspPart.Color = Color3.fromRGB(255,0,0)
 	uspPart.Parent = workspace
 
-	-- Update loop
 	local conn
 	conn = RunService.RenderStepped:Connect(function()
 		if not hrp or not hrp.Parent then
@@ -342,13 +428,12 @@ local function createESPForPlayer(plr)
 
 		nameLabel.Text = plr.Name
 		healthLabel.Text = "HP: "..math.floor(hum.Health)
-		uspPart.CFrame = hrp.CFrame -- suit le joueur
+		uspPart.CFrame = hrp.CFrame 
 	end)
 
 	table.insert(espConnections, {hl, billboard, uspPart, conn})
 end
 
--- Active ESP sur tous les joueurs existants
 local function startESP()
 	if espEnabled then return end
 	espEnabled = true
@@ -357,7 +442,6 @@ local function startESP()
 		createESPForPlayer(plr)
 	end
 
-	-- Ajouter automatiquement ESP aux joueurs qui rejoignent
 	Players.PlayerAdded:Connect(function(plr)
 		plr.CharacterAdded:Connect(function()
 			if espEnabled then
@@ -366,7 +450,6 @@ local function startESP()
 		end)
 	end)
 
-	-- Réappliquer ESP si un joueur respawn
 	for _, plr in pairs(Players:GetPlayers()) do
 		plr.CharacterAdded:Connect(function()
 			if espEnabled then
@@ -745,6 +828,10 @@ btn.MouseButton1Click:Connect(function()
 		commands()
 	elseif cmd == "infjump" or cmd == "infinitejump" or cmd == "infinite jump" or cmd == "infinite jumps" or cmd == "inf jump" or cmd == "inf jumps" then
 		infiniteJump()
+	elseif cmd == "aimbot" then
+		startAimbot()
+	elseif cmd == "unaimbot" then
+		stopAimbot()
 	elseif cmd == "spamremotes" then
 		spamremotes(0.01)
 	end
