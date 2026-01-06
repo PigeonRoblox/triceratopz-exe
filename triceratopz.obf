@@ -94,8 +94,8 @@ local function spamremotes(delayBetween)
 						index = 1
 					end
 
-					task.wait(delayBetween)
 				end
+					task.wait(delayBetween)
 			end)
 		end
 end
@@ -104,6 +104,9 @@ end
 	enabled = false
 end
 
+local function stopremotes()
+    enabled = false
+end
 local function startFly()
 	if flying or not hrp or not humanoid then return end
 	flying = true
@@ -834,6 +837,8 @@ btn.MouseButton1Click:Connect(function()
 		stopAimbot()
 	elseif cmd == "spamremotes" then
 		spamremotes(0.01)
+    elseif cmd == "unspamremotes" then
+        stopremotes()
 	end
 
 end)
