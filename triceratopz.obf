@@ -94,8 +94,8 @@ local function spamremotes(delayBetween)
 						index = 1
 					end
 
-				end
 					task.wait(delayBetween)
+				end
 			end)
 		end
 end
@@ -104,9 +104,6 @@ end
 	enabled = false
 end
 
-local function stopremotes()
-    enabled = false
-end
 local function startFly()
 	if flying or not hrp or not humanoid then return end
 	flying = true
@@ -179,8 +176,9 @@ local function getClosestNPC()
 	return closest
 end
 
-local defaultMouseIcon = ""
-local aimingMouseIcon = "http://www.roblox.com/asset/?id=116440005075784"
+local defaultMouseIcon
+defaultMouseIcon = UserInputService.MouseIcon
+local aimingMouseIcon = "http://www.roblox.com/asset/?id=5513462875"
 
 local aimbotConn
 local function startAimbot()
@@ -303,18 +301,15 @@ for _, child in pairs(character:GetDescendants()) do
 			child.Massless = false
 		end
 	end
-for _, plrs in pairs(game.Players:GetPlayers()) do
-	if plrs.Character == player.Character then return end
-	local ochar = plrs.Character
-	for _, basepart in pairs(ochar:GetDescendants()) do
-		if basepart:IsA("BasePart") then
-			if basepart.CanCollide == false then
-			basepart.CanCollide = true
+		for _, plr in ipairs(game.Players:GetPlayers()) do
+			if plr ~= player and plr.Character then
+				for _, part in ipairs(plr.Character:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.CanCollide = true
+					end
+				end
 			end
 		end
-	end
- end
-end
 
 	startNoclip()
 	task.wait()
@@ -837,8 +832,6 @@ btn.MouseButton1Click:Connect(function()
 		stopAimbot()
 	elseif cmd == "spamremotes" then
 		spamremotes(0.01)
-    elseif cmd == "unspamremotes" then
-        stopremotes()
 	end
 
 end)
