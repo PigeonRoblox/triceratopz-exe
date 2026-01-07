@@ -301,15 +301,16 @@ for _, child in pairs(character:GetDescendants()) do
 			child.Massless = false
 		end
 	end
-		for _, plr in ipairs(game.Players:GetPlayers()) do
-			if plr ~= player and plr.Character then
-				for _, part in ipairs(plr.Character:GetDescendants()) do
-					if part:IsA("BasePart") then
-						part.CanCollide = true
-					end
+	for _, plr in ipairs(game.Players:GetPlayers()) do
+		if plr ~= player and plr.Character then
+			for _, part in ipairs(plr.Character:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = true
 				end
 			end
 		end
+	end
+	end
 
 	startNoclip()
 	task.wait()
