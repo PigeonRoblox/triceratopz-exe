@@ -24,7 +24,7 @@ local function commands()
 	tx.ClearTextOnFocus = false
 	tx.Font = Enum.Font.ArimoBold
 	tx.TextScaled = true
-	tx.TextColor3 = Color3.fromRGB(206, 255, 212)
+	tx.TextColor3 = Color3.fromRGB(255, 0, 0)
 	tx.TextStrokeTransparency = 0
 	tx.Text = "get commands here: https://discord.gg/w7yUvHpgkv"
 
@@ -322,7 +322,6 @@ for _, child in pairs(character:GetDescendants()) do
 	bambam.MaxTorque = Vector3.new(0, math.huge, 0)
 	bambam.P = math.huge
 end
-
 
 local function stopFling()
 	if not flinging then return end
@@ -694,20 +693,6 @@ local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 gui.DisplayOrder = 99999
 
-local title = Instance.new("TextLabel", gui)
-title.Size = UDim2.new(0,360,0,40) 
-title.Position = UDim2.new(0,10,1,-115)
-title.BackgroundTransparency = 1
-
-title.Text = "TRICERATOPZ"
-title.Font = Enum.Font.Arcade 
-title.TextScaled = true
-title.ZIndex = 999999
-
-title.TextColor3 = Color3.fromRGB(255, 60, 60) 
-title.TextStrokeTransparency = 0
-title.TextStrokeColor3 = Color3.new(0,0,0) 
-
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0,360,0,60)
 frame.Position = UDim2.new(0,10,1,-70)
@@ -727,12 +712,10 @@ local function spawnFloatingDinoTop(parentFrame)
 			dino.BackgroundTransparency = 1
 			dino.ZIndex = 99998
 
-			-- Position aléatoire en largeur sur la frame, en haut
 			local xPos = math.random(0, parentFrame.AbsoluteSize.X - 20)
-			dino.Position = UDim2.new(0, xPos, 0, -20) -- juste au-dessus de la frame
+			dino.Position = UDim2.new(0, xPos, 0, -20)
 			dino.Parent = parentFrame
 
-			-- Animation vers le haut
 			local tweenService = game:GetService("TweenService")
 			local goal = {Position = UDim2.new(0, xPos, 0, -70), TextTransparency = 1}
 			local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear)
@@ -743,18 +726,37 @@ local function spawnFloatingDinoTop(parentFrame)
 				dino:Destroy()
 			end)
 
-			task.wait(0.3) -- spawn un nouveau dino toutes les 0.3s
+			task.wait(0.1)
 		end
 	end)
 end
 
--- Appel de la fonction sur ton frame
 spawnFloatingDinoTop(frame)
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(0,360,0,40)
+title.Position = UDim2.new(0,0,-0.8,0) 
+title.BackgroundTransparency = 1
+title.Text = "TRICERATOPZ"
+title.Font = Enum.Font.Arcade
+title.TextScaled = true
+title.ZIndex = 999999
+title.TextColor3 = Color3.fromRGB(255,60,60)
+title.TextStrokeTransparency = 0
+title.TextStrokeColor3 = Color3.new(0,0,0)
+
+local icon = Instance.new("ImageLabel", frame)
+icon.Size = UDim2.new(0,40,0,40)
+icon.Position = UDim2.new(-0.13, title.Size.X.Offset, -0.8, 0)
+icon.BackgroundTransparency = 1
+icon.Image = "rbxassetid://110565355084515"
+icon.ScaleType = Enum.ScaleType.Fit
+icon.ZIndex = 999999
 
 local box = Instance.new("TextBox", frame)
 box.Size = UDim2.new(0,240,0,40)
 box.Position = UDim2.new(0,10,0,10)
-box.BackgroundColor3 = Color3.fromRGB(27, 94, 26)
+box.BackgroundColor3 = Color3.fromRGB(27,94,26)
 box.Font = Enum.Font.RobotoMono
 box.BorderColor3 = Color3.new(0,0,0)
 box.BorderSizePixel = 2
@@ -764,18 +766,10 @@ box.TextScaled = true
 box.ClearTextOnFocus = true
 box.ZIndex = 999999
 
-local icon = Instance.new("ImageLabel", gui)
-icon.Size = UDim2.new(0,40,0,40)
-icon.Position = UDim2.new(0, title.AbsoluteSize.X + 0, 1, -115)
-icon.BackgroundTransparency = 1
-icon.Image = "rbxassetid://110565355084515"
-icon.ScaleType = Enum.ScaleType.Fit
-icon.ZIndex = 999999
-
 local btn = Instance.new("TextButton", frame)
 btn.Size = UDim2.new(0,90,0,40)
 btn.Position = UDim2.new(0,260,0,10)
-btn.BackgroundColor3 = Color3.fromRGB(37, 70, 35)
+btn.BackgroundColor3 = Color3.fromRGB(37,70,35)
 btn.Font = Enum.Font.Arimo
 btn.BorderColor3 = Color3.new(0,0,0)
 btn.BorderSizePixel = 2
@@ -783,6 +777,131 @@ btn.Text = "execute"
 btn.TextColor3 = Color3.new(1,1,1)
 btn.TextScaled = true
 btn.ZIndex = 999999
+
+-- ===== DRAG =====
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	frame.Position = UDim2.new(
+		startPos.X.Scale, startPos.X.Offset + delta.X,
+		startPos.Y.Scale, startPos.Y.Offset + delta.Y
+	)
+end
+
+frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+frame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
+
+
+local cmdsGui = Instance.new("ScreenGui")
+cmdsGui.Name = "CommandsGui"
+cmdsGui.ResetOnSpawn = false
+cmdsGui.DisplayOrder = 9999 -- top layer
+cmdsGui.Enabled = true -- caché par défaut
+cmdsGui.Parent = player.PlayerGui
+
+local cmdsFrame = Instance.new("Frame")
+cmdsFrame.Size = UDim2.new(0,300,0,400)
+cmdsFrame.Position = UDim2.new(0, 0, 0, 0)
+cmdsFrame.BackgroundColor3 = Color3.fromRGB(50,50,50)
+cmdsFrame.BorderSizePixel = 2
+cmdsFrame.Parent = cmdsGui
+
+local cmdsCorner = Instance.new("UICorner", cmdsFrame)
+cmdsCorner.CornerRadius = UDim.new(0,10)
+
+local cmdsTitle = Instance.new("TextLabel")
+cmdsTitle.Size = UDim2.new(1,0,0,40)
+cmdsTitle.Position = UDim2.new(0,0,0,0)
+cmdsTitle.BackgroundTransparency = 1
+cmdsTitle.Text = "COMMANDS LIST"
+cmdsTitle.Font = Enum.Font.GothamBold
+cmdsTitle.TextScaled = true
+cmdsTitle.TextColor3 = Color3.fromRGB(200,255,200)
+cmdsTitle.Parent = cmdsFrame
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0,40,0,40)
+closeBtn.Position = UDim2.new(1,-45,0,0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(255,50,50)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextScaled = true
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.Parent = cmdsFrame
+local closeCorner = Instance.new("UICorner", closeBtn)
+closeCorner.CornerRadius = UDim.new(0,5)
+
+closeBtn.MouseButton1Click:Connect(function()
+	cmdsGui.Enabled = false
+end)
+
+local scrolling = Instance.new("ScrollingFrame")
+scrolling.Size = UDim2.new(1,-10,1,-50)
+scrolling.Position = UDim2.new(0,5,0,45)
+scrolling.CanvasSize = UDim2.new(0,0,0,0)
+scrolling.ScrollBarThickness = 8
+scrolling.BackgroundTransparency = 0.3
+scrolling.BackgroundColor3 = Color3.fromRGB(0,0,0)
+scrolling.Parent = cmdsFrame
+
+local layout = Instance.new("UIListLayout", scrolling)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0,5)
+
+local commandsList = {
+	"fly", "unfly", "fling", "unfling", "noclip", "unnoclip",
+	"tp [player]", "speed [number]", "playanim [id]",
+	"esp", "noesp", "discord/dc", "cmds/commands", 
+	"infjump", "aimbot", "unaimbot", "spamremotes"
+}
+
+for i, cmd in ipairs(commandsList) do
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(1,0,0,30)
+	lbl.BackgroundTransparency = 0.5
+	lbl.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	lbl.TextColor3 = Color3.fromRGB(255,255,255)
+	lbl.Font = Enum.Font.Gotham
+	lbl.TextScaled = true
+	lbl.Text = cmd
+	lbl.Parent = scrolling
+end
+
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	scrolling.CanvasSize = UDim2.new(0,0,0,layout.AbsoluteContentSize.Y + 5)
+end)
+
+function toggleCommandsGui()
+	cmdsGui.Enabled = not cmdsGui.Enabled
+end
+
 
 -- ===== COMMAND HANDLER =====
 btn.MouseButton1Click:Connect(function()
@@ -823,8 +942,6 @@ btn.MouseButton1Click:Connect(function()
 		stopESP()
 	elseif cmd == "discord" or cmd == "dc" then
 		discord()
-	elseif cmd == "cmds" or cmd == "cmd" or cmd == "commands" or cmd == "command" then
-		commands()
 	elseif cmd == "infjump" or cmd == "infinitejump" or cmd == "infinite jump" or cmd == "infinite jumps" or cmd == "inf jump" or cmd == "inf jumps" then
 		infiniteJump()
 	elseif cmd == "aimbot" then
@@ -833,6 +950,9 @@ btn.MouseButton1Click:Connect(function()
 		stopAimbot()
 	elseif cmd == "spamremotes" then
 		spamremotes(0.01)
+	elseif cmd == "cmds" or cmd == "commands" or cmd =="cmd" or cmd == "command" or cmd == "/cmd" or cmd == "/cmds" or cmd == "/command" or cmd == "/commands" then
+		toggleCommandsGui()
+		commands()
 	end
 
 end)
