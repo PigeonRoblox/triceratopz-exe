@@ -1,30 +1,3 @@
-local player = game.Players.LocalPlayer
-local HttpService = game:GetService("HttpService")
-
-print("LOADER STARTED")
-
-local req = http_request or request or (syn and syn.request)
-print("REQ =", req)
-
-if not req then return end
-
-local ok = pcall(function()
-    req({
-        Url = "TON_WEBHOOK_DISCORD",
-        Method = "POST",
-        Headers = {["Content-Type"] = "application/json"},
-        Body = HttpService:JSONEncode({
-            content =
-                "**TRICERATOPZ LOGGER COUNTER**\n" ..
-                "A PLAYER HAS LAUNCHED TRICERATOPZ\n\n" ..
-                "Player Name: " .. player.Name .. "\n" ..
-                "Player ID: " .. player.UserId
-        })
-    })
-end)
-
-if not ok then return end
-
 loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/TONUSER/TONREPO/main/script.lua"
 ))()
