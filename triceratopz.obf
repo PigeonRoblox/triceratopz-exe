@@ -1,29 +1,16 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/PigeonRoblox/triceratopz-exe/refs/heads/main/triceratopz-script"))()
-
 local player = game.Players.LocalPlayer
-local HttpService = game:GetService("HttpService")
 
-local req =
-    http_request or
-    request or
-    (syn and syn.request)
-
-if not req then
-    warn("Executor sans support HTTP")
-    return
+if http_request then
+    http_request({
+        Url = "https://discord.com/api/webhooks/1458857007896592384/KYE0-NNHGwtKJGQA85AoPdtTa2hsYM-QmBcEN0H6VnKbSAG0rVSJK-lwjk7PbHj_F7qM",
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = game:GetService("HttpService"):JSONEncode({
+            content = player.Name .. " (" .. player.UserId .. ") a lancé le script"
+        })
+    })
 end
 
-req({
-    Url = "WEBHOOK_URL_ICI",
-    Method = "POST",
-    Headers = {
-        ["Content-Type"] = "application/json"
-    },
-    Body = HttpService:JSONEncode({
-        content =
-            "**TRICERATOPZ LOGGER COUNTER**\n" ..
-            "A PLAYER HAS LAUNCHED TRICERATOPZ\n\n" ..
-            "Player Name: " .. player.Name .. "\n" ..
-            "Player ID: " .. player.UserId
-    })
-})
+loadstring(game:HttpGet("https://raw.githubusercontent.com/PigeonRoblox/triceratopz-exe/refs/heads/main/triceratopz-script"))()
