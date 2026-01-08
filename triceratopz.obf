@@ -1,7 +1,11 @@
 local player = game.Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
 
+print("LOADER STARTED")
+
 local req = http_request or request or (syn and syn.request)
+print("REQ =", req)
+
 if not req then return end
 
 local ok = pcall(function()
