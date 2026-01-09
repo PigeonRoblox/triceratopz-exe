@@ -1,4 +1,4 @@
-print("script started - TRICERATOPZ")
+
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -16,7 +16,6 @@ local move = {F=0,B=0,L=0,R=0,U=0,D=0}
 local isLegacyChat = TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService
 
 local spamming = false
-
 local spamargs = {"Nig- Hey", "you", "good", "?"}
 
 local function commands()
@@ -101,6 +100,7 @@ end
 
 local function boost()
 	local Terrain = workspace:FindFirstChildWhichIsA("Terrain")
+	local Lighting = game.Lighting
 	Terrain.WaterWaveSize = 0
 	Terrain.WaterWaveSpeed = 0
 	Terrain.WaterReflectance = 0
@@ -291,6 +291,10 @@ local function unspam()
 	spamming = false
 end
 
+local function loadinvis()
+	loadstring(game:HttpGet("https://pastebin.com/raw/3Rnd9rHf"))()
+end
+
 local function startFly()
 	if flying or not hrp or not humanoid then return end
 	flying = true
@@ -363,6 +367,29 @@ local function getClosestNPC()
 	return closest
 end
 
+local function loadflick()
+	loadstring(game:HttpGet("https://apigetunx.vercel.app/UNX.lua",true))()
+end
+
+local function loadbf()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))()
+end
+
+local function loadbrook()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/as6cd0/SP_Hub/refs/heads/main/Brookhaven"))()
+end
+
+local function loadmm2()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/orialdev/VisionHub/refs/heads/main/main.lua"))()
+end
+
+local function load99()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Rx1m/CpsHub/refs/heads/main/Hub",true))()
+end
+
+local function flygui()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+end
 local defaultMouseIcon
 defaultMouseIcon = UserInputService.MouseIcon
 local aimingMouseIcon = "http://www.roblox.com/asset/?id=5513462875"
@@ -1054,9 +1081,9 @@ local commandsList = {
 	"tp [player]", "speed [number]", "playanim [id]",
 	"esp", "noesp", "discord/dc", "cmds/commands", 
 	"infjump", "aimbot", "unaimbot", "spamremotes",
-	"jump [number]", "dex", "remotespy", "playerid", "gameid",
+	"jump [number]", "dex", "playerid", "gameid",
 	"cmds", "boost / antilag", "spamchat", "unspam", "findadmin",
-	"update"
+	"update", "/brookhaven", "/bf", "/mm2", "/flick", "/99nights", "flygui", "invisibility",
 }
 
 for i, cmd in ipairs(commandsList) do
@@ -1079,8 +1106,6 @@ function toggleCommandsGui()
 	cmdsGui.Enabled = not cmdsGui.Enabled
 end
 
-
--- ===== COMMAND HANDLER =====
 btn.MouseButton1Click:Connect(function()
 	local cmd = string.lower(box.Text)
 
@@ -1137,8 +1162,6 @@ btn.MouseButton1Click:Connect(function()
 		commands()
 	elseif cmd == "dex" or cmd == "dexeplorer" or cmd == "exp" or cmd == "explorer" or cmd == "expl" then
 		loaddex()
-	elseif cmd == "rspy" or cmd == "remotespy" then
-		loadrspy()
 	elseif cmd == "placeid" then
 		placeid()
 	elseif string.sub(cmd,1,2) == "playerid" then
@@ -1156,9 +1179,22 @@ btn.MouseButton1Click:Connect(function()
 		findadmincmds()
 	elseif cmd == "update" then
 		nextupdate()
+	elseif cmd == "/bf" then
+		loadbf()
+	elseif cmd == "/flick" then
+		loadflick()
+	elseif cmd == "/99nights" then
+		load99()
+	elseif cmd == "flygui" then
+		flygui()
+	elseif cmd == "/mm2" then
+		loadmm2()
+	elseif cmd == "/brookhaven" then
+		loadbrook()
+	elseif cmd == "invisibility" then
+		loadinvis()
 		end
 
 end)
 
 warn("TRICERATOPZ LOADED SUCCESFULY")
-
